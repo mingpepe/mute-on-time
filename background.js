@@ -2,6 +2,13 @@ console.log('background.js is executing');
 
 const CHECK_INTERVAL = 5 * 1000;
 
+var startHour = 11;
+var startMinute = 50;
+var endHour = 13;
+var endMinute = 20;
+var timeoutId = undefined;
+var start, end;
+
 chrome.storage.local.get('mute_time').then((result) => {
     if (result.mute_time) {
         startHour = result.mute_time[0];
@@ -10,8 +17,16 @@ chrome.storage.local.get('mute_time').then((result) => {
         endMinute = result.mute_time[3];
         console.log(`Set from local storage, start hour = ${startHour}, minute = ${startMinute}`);
         console.log(`Set from local storage, end hour = ${endHour}, minute = ${endMinute}`);
+        init();
     }
-    init();
+    else {
+        console.log('No mute_time in local storage, write default value')
+        chrome.storage.local.set({ 'mute_time': [startHour, startMinute, endHour, endMinute] }, function () {
+            console.log(`Set start hour = ${startHour} minute = ${startMinute}`);
+            console.log(`Set end hour = ${endHour} minute = ${endMinute}`);
+            init();
+        });
+    }
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
@@ -32,13 +47,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
     }
 });
-
-var startHour = 11;
-var startMinute = 50;
-var endHour = 13;
-var endMinute = 20;
-var timeoutId = undefined;
-var start, end;
 
 function init() {
     start = new Date();
