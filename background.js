@@ -44,6 +44,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
                 `Old value was "${oldValue}", new value is "${newValue}".`
             );
             init();
+            break;
         }
     }
 });
