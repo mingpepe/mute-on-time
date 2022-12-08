@@ -25,7 +25,12 @@ module.exports = {
       new CopyPlugin({
          patterns: [
              {from: ".", to: ".", context: "public"},
-             {from: ".", to: "popup", context: "popup"},
+             {from: ".", to: "popup", context: "popup", filter: (name) => {
+                 if (name.endsWith(".ts")) {
+                     return false;
+                 }
+                 return true;
+             }},
              {from: ".", to: "icons", context: "icons"},
         ]
       }),
