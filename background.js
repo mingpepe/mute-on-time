@@ -1,12 +1,9 @@
 console.log('background.js is executing');
 
-const CHECK_INTERVAL = 5 * 1000;
-
 var startHour = 11;
 var startMinute = 50;
 var endHour = 13;
 var endMinute = 20;
-var timeoutId = undefined;
 var start, end;
 
 chrome.storage.local.get('mute_time').then((result) => {
@@ -49,6 +46,15 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    console.log(`onAlarm : ${alarm.name}`)
+    if (alarm.name == 'tryMute') {
+        tryMute();
+    } else {
+        tryUnmute();
+    }
+});
+
 function init() {
     start = new Date();
     start.setHours(startHour, startMinute);
@@ -64,11 +70,8 @@ function init() {
     console.log(`Set initial start date ${start}`);
     console.log(`Set initial end date ${end}`);
 
-    if (timeoutId != undefined) {
-        clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(tryMute, 5000);
+    chrome.alarms.clearAll();
+    chrome.alarms.create('tryMute', { delayInMinutes: 1, });
 }
 
 function tryMute() {
@@ -78,10 +81,10 @@ function tryMute() {
         mute(true);
 
         console.log('Try unmute');
-        timeoutId = setTimeout(tryUnmute, CHECK_INTERVAL);
+        chrome.alarms.create('tryUnmute', { delayInMinutes: 1, });
     }
     else {
-        timeoutId = setTimeout(tryMute, CHECK_INTERVAL);
+        chrome.alarms.create('tryMute', { delayInMinutes: 1, });
     }
 }
 
@@ -96,10 +99,10 @@ function tryUnmute() {
         console.log(`Set new end date ${end}`);
 
         console.log('Try mute');
-        timeoutId = setTimeout(tryMute, CHECK_INTERVAL);
+        chrome.alarms.create('tryMute', { delayInMinutes: 1, });
     }
     else {
-        timeoutId = setTimeout(tryUnmute, CHECK_INTERVAL);
+        chrome.alarms.create('tryUnmute', { delayInMinutes: 1, });
     }
 }
 
