@@ -4,7 +4,8 @@ var startHour = 11;
 var startMinute = 50;
 var endHour = 13;
 var endMinute = 20;
-var start, end;
+var start: Date;
+var end: Date
 
 chrome.storage.local.get('mute_time').then((result) => {
     if (result.mute_time) {
@@ -55,6 +56,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     }
 });
 
+function addDays(date: Date, days: number) {
+    var _date = new Date(date.valueOf());
+    _date.setDate(date.getDate() + days);
+    return _date;
+}
+
 function init() {
     start = new Date();
     start.setHours(startHour, startMinute);
@@ -63,8 +70,8 @@ function init() {
 
     if (new Date() >= end) {
         console.log('The mute time is passed, go to next day')
-        start = start.addDays(1);
-        end = end.addDays(1);
+        start = addDays(start, 1);
+        end = addDays(end, 1);
     }
 
     console.log(`Set initial start date ${start}`);
@@ -93,8 +100,8 @@ function tryUnmute() {
         console.log('Unmute');
         mute(false);
 
-        start = start.addDays(1);
-        end = end.addDays(1);
+        start = addDays(start, 1);
+        end = addDays(end, 1);
         console.log(`Set new start date ${start}`);
         console.log(`Set new end date ${end}`);
 
@@ -106,12 +113,10 @@ function tryUnmute() {
     }
 }
 
-function mute(muted) {
-    chrome.tabs.query({}, result => result.forEach(tab => chrome.tabs.update(tab.id, { muted: muted })));
-}
-
-Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
+function mute(muted: boolean) {
+    chrome.tabs.query({}, result => result.forEach(tab => {
+        if (tab.id) {
+            chrome.tabs.update(tab.id, { muted: muted })}
+        }
+    ));
 }
