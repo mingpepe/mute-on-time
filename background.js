@@ -24,26 +24,26 @@ chrome.storage.local.get('mute_time').then((result) => {
             init();
         });
     }
-});
 
-chrome.storage.onChanged.addListener((changes, namespace) => {
-    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (key == 'mute_time') {
-            startHour = newValue[0];
-            startMinute = newValue[1];
-            endHour = newValue[2];
-            endMinute = newValue[3];
-            console.log(`Local storage onChanged, start hour = ${startHour}, minute = ${startMinute}`);
-            console.log(`Local storage onChanged, end hour = ${endHour}, minute = ${endMinute}`);
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+        for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+            if (key == 'mute_time') {
+                startHour = newValue[0];
+                startMinute = newValue[1];
+                endHour = newValue[2];
+                endMinute = newValue[3];
+                console.log(`Local storage onChanged, start hour = ${startHour}, minute = ${startMinute}`);
+                console.log(`Local storage onChanged, end hour = ${endHour}, minute = ${endMinute}`);
 
-            console.log(
-                `Storage key "${key}" in namespace "${namespace}" changed.`,
-                `Old value was "${oldValue}", new value is "${newValue}".`
-            );
-            init();
-            break;
+                console.log(
+                    `Storage key "${key}" in namespace "${namespace}" changed.`,
+                    `Old value was "${oldValue}", new value is "${newValue}".`
+                );
+                init();
+                break;
+            }
         }
-    }
+    });
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
